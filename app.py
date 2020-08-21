@@ -37,8 +37,6 @@ def signup():
         username_errors.append("This field is required.")
     elif len(str(username)) < 7:
         username_errors.append("Username must have at least 6 characters.")
-    # elif IntegrityError as e: 
-    #     username_errors.append("This username already exist. Please try another.")
 
     password_errors = []
     if not password: 
@@ -71,3 +69,25 @@ def signup():
             json_result["user"] = user.to_json()
 
         return jsonify(json_result)
+
+@app.route("/users/login", methods=["POST"])
+def login():
+    """Handle user login."""
+
+    username = request.json["username"]
+    password = request.json["password"]
+
+    user = User.authenticate(username, password)
+
+    json_result = {}
+
+    if not user: 
+        json_errors = {}
+        json_errors["errors"] = "Username and password does not match. Please try again."
+        json_result["errors"] = json_errors
+
+    else:
+        json_result["user"] = user.to_json()
+
+    return jsonify(json_result)
+

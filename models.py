@@ -2,7 +2,6 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-# from dataclasses import dataclass
 from sqlalchemy.exc import IntegrityError
 
 from datetime import datetime
@@ -10,7 +9,6 @@ from datetime import datetime
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
-# @dataclass
 class User(db.Model):
     """User in the system."""
 
@@ -93,7 +91,6 @@ class User(db.Model):
             "imageUrl": self.image_url,
         }
 
-# @dataclass
 class Plant(db.Model):
     """Plants saved from an external database."""
 
@@ -138,7 +135,6 @@ class Plant(db.Model):
 
     journal_entry = db.relationship('PlantJournal', backref='plants')
 
-# @dataclass
 class ProgressJournal(db.Model):
     """Journal for each plants that the user add to their profile."""
 
@@ -172,7 +168,6 @@ class ProgressJournal(db.Model):
 
     journal_entry = db.relationship('PlantJournal', backref='progress_journals')
 
-# @dataclass
 class UserPlant(db.Model):
     """References the plants that each user added."""
 
@@ -216,7 +211,6 @@ class UserPlant(db.Model):
         db.String(100),
     )
 
-# @dataclass
 class PlantJournal(db.Model):
     """Reference the journals added to each plants."""
 
