@@ -1,7 +1,6 @@
 import os 
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-from sqlalchemy.exc import IntegrityError
 
 from models import db, connect_db, User, Plant, ProgressJournal, UserPlant, PlantJournal
 
@@ -23,10 +22,52 @@ connect_db(app)
 def test():
     return ("WORKS")
 
-@app.route("/users/signup", methods=["GET", "POST"])
+@app.route("/users/signup", methods=["POST"])
 def signup():
     """Handle user signup."""
 
+    username = request.json["username"]
+    password = request.json["password"]
+    image_url = request.json["imageUrl"]
     
+    json_result = {}
 
-    return ("WORKS")
+    username_errors = []
+    if not username: 
+        username_errors.append("This field is required.")
+    elif len(str(username)) < 7:
+        username_errors.append("Username must have at least 6 characters.")
+    # elif IntegrityError as e: 
+    #     username_errors.append("This username already exist. Please try another.")
+
+    password_errors = []
+    if not password: 
+        password_errors.append("This field is required.")
+    elif len(str(password)) < 7:
+        password_errors.append("Password must have at least 6 characters.")
+
+    if not image_url:
+        image_url = "/static/images/default-pic.png"
+
+    json_errors = {}
+
+    if len(username_errors) > 0:
+        json_errors["username"] = username_errors
+
+    if len(password_errors) > 0:
+        json_errors["password"] = password_errors
+    
+    if json_errors:
+        json_result["errors"] = json_errors
+        return (jsonify(json_result))
+    
+    else:
+        user = User.signup(username, password, image_url)
+        if user == None:
+            username_errors.append("This username already exist. Please try another.")
+            json_errors["username"] = username_errors
+            json_result["errors"] = json_errors
+        else:
+            json_result["user"] = user.to_json()
+
+        return jsonify(json_result)

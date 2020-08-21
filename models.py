@@ -2,12 +2,15 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+# from dataclasses import dataclass
+from sqlalchemy.exc import IntegrityError
 
 from datetime import datetime
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
+# @dataclass
 class User(db.Model):
     """User in the system."""
 
@@ -53,8 +56,15 @@ class User(db.Model):
             image_url=image_url,
         )
 
-        db.session.add(user)
-        return user
+        try:
+            db.session.add(user)
+            db.session.commit()
+            
+            return user
+        
+        except IntegrityError as e:
+            
+            return None
 
     @classmethod
     def authenticate(cls, username, password):
@@ -76,6 +86,14 @@ class User(db.Model):
 
         return False
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "imageUrl": self.image_url,
+        }
+
+# @dataclass
 class Plant(db.Model):
     """Plants saved from an external database."""
 
@@ -120,6 +138,7 @@ class Plant(db.Model):
 
     journal_entry = db.relationship('PlantJournal', backref='plants')
 
+# @dataclass
 class ProgressJournal(db.Model):
     """Journal for each plants that the user add to their profile."""
 
@@ -153,6 +172,7 @@ class ProgressJournal(db.Model):
 
     journal_entry = db.relationship('PlantJournal', backref='progress_journals')
 
+# @dataclass
 class UserPlant(db.Model):
     """References the plants that each user added."""
 
@@ -196,6 +216,7 @@ class UserPlant(db.Model):
         db.String(100),
     )
 
+# @dataclass
 class PlantJournal(db.Model):
     """Reference the journals added to each plants."""
 
