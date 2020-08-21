@@ -1,5 +1,7 @@
 import os 
 from flask import Flask, request, jsonify
+import re
+import requests
 # from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, User, Plant, ProgressJournal, UserPlant, PlantJournal
@@ -21,6 +23,14 @@ connect_db(app)
 @app.route("/test", methods=["GET"])
 def test():
     return ("WORKS")
+
+@app.route("/search", methods=["GET"])
+def search():
+    query = request.args["query"]
+    # res_num = requests.get("http://numbersapi.com/" + str(r) + "/trivia")
+    res_trefle = requests.get("https://trefle.io/api/v1/plants/search?token=dsRk-kcdXoieKDbu8qVaNRIlJsrw31rYHZ0xqND0w08&q=" + str(query))
+    # print("res_trefle ", res_trefle.text)
+    return jsonify(res_trefle.text)
 
 @app.route("/users/signup", methods=["POST"])
 def signup():
