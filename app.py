@@ -1,5 +1,6 @@
 import os 
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 import re
 import requests
 # from flask_debugtoolbar import DebugToolbarExtension
@@ -7,10 +8,11 @@ import requests
 from models import db, connect_db, User, Plant, ProgressJournal, UserPlant, PlantJournal
 
 app = Flask(__name__)
+cors = CORS(app)
 
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ.get('DATABASE_URL', 'postgres:///brown_thumb'))
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 # app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
@@ -19,12 +21,12 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "br0wnthumbs")
 
 connect_db(app)
 
-
 @app.route("/test", methods=["GET"])
 def test():
     return ("WORKS")
 
 @app.route("/search", methods=["GET"])
+@cross_origin()
 def search():
     query = request.args["query"]
     # res_num = requests.get("http://numbersapi.com/" + str(r) + "/trivia")
@@ -33,6 +35,7 @@ def search():
     return jsonify(res_trefle.text)
 
 @app.route("/users/signup", methods=["POST"])
+@cross_origin()
 def signup():
     """Handle user signup."""
 
@@ -81,6 +84,7 @@ def signup():
         return jsonify(json_result)
 
 @app.route("/users/login", methods=["POST"])
+@cross_origin()
 def login():
     """Handle user login."""
 
