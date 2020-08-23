@@ -58,10 +58,12 @@ def search():
         )
 
         # if the item does not already exists in your database, insert it
-        plant = db.session.query(Plant.plant_api_id).filter_by(plant_api_id=item['id']).first()
-        if plant is None: 
-            db.session.add(dbPlant)
-            db.session.commit()
+        # don't forget to take this shit out starting here
+        # plant = db.session.query(Plant.plant_api_id).filter_by(plant_api_id=item['id']).first()
+        # if plant is None: 
+        #     db.session.add(dbPlant)
+        #     db.session.commit()
+        # take this shit out above
 
         print("*** plant", dbPlant.common_name)
 
