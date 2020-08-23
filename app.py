@@ -29,10 +29,48 @@ def test():
 @cross_origin()
 def search():
     query = request.args["query"]
-    # res_num = requests.get("http://numbersapi.com/" + str(r) + "/trivia")
+
+    result_plants = []
+
     res_trefle = requests.get("https://trefle.io/api/v1/plants/search?token=dsRk-kcdXoieKDbu8qVaNRIlJsrw31rYHZ0xqND0w08&q=" + str(query))
-    # print("res_trefle ", res_trefle.text)
-    return jsonify(res_trefle.text)
+    data = res_trefle.json()["data"]
+
+    json_result = {}
+    if not data:
+        # if res_trefle is null, that means we cannot get anything back from external API
+        # query our own local database for the plants based on the search query
+        # add the result to result_plants array
+        json_result["result"] = "Oh no! There are no plants found. Give it another try!" 
+        return jsonify(json_result)
+    
+    # if res_trefle is NOT null -> that means wer are succesfully being able to get something back from external API
+    for item in data:
+        print("plant_api_id: {}\ncommon_name: {}\nscientific_name: {}\nfamily: {}\nfamily_common_name: {}\ngenus: {}\nimage_url: {}\n".format(item['id'],item['common_name'],item['scientific_name'],item['family'],item['family_common_name'],item['genus'],item['image_url']))
+
+        dbPlant = Plant(
+            plant_api_id=item['id'],
+            common_name=item['common_name'],
+            scientific_name=item['scientific_name'],
+            family=item['family'],
+            family_common_name=item['family_common_name'],
+            genus=item['genus'],
+            image_url=item['image_url'],
+        )
+
+        # if the item does not already exists in your database, insert it
+        plant = db.session.query(Plant.plant_api_id).filter_by(plant_api_id=item['id']).first()
+        if plant is None: 
+            db.session.add(dbPlant)
+            db.session.commit()
+
+        print("*** plant", dbPlant.common_name)
+
+        #add item to result_plants array
+        result_plants.append(dbPlant.to_json())
+
+    json_result["results"] = result_plants
+    return jsonify(json_result)
+
 
 @app.route("/users/signup", methods=["POST"])
 @cross_origin()

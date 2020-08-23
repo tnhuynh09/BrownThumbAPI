@@ -135,6 +135,18 @@ class Plant(db.Model):
 
     journal_entry = db.relationship('PlantJournal', backref='plants')
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "plantApiId": self.plant_api_id,
+            "commonName": self.common_name,
+            "scientificName": self.scientific_name,
+            "family": self.family,
+            "familyCommonName": self.family_common_name,
+            "genus": self.genus,
+            "imageUrl": self.image_url,
+        }
+
 class ProgressJournal(db.Model):
     """Journal for each plants that the user add to their profile."""
 
