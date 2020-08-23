@@ -28,6 +28,7 @@ def test():
 @app.route("/search", methods=["GET"])
 @cross_origin()
 def search():
+    """Handle search."""
     query = request.args["query"]
 
     result_plants = []
@@ -45,7 +46,7 @@ def search():
     
     # if res_trefle is NOT null -> that means wer are succesfully being able to get something back from external API
     for item in data:
-        print("plant_api_id: {}\ncommon_name: {}\nscientific_name: {}\nfamily: {}\nfamily_common_name: {}\ngenus: {}\nimage_url: {}\n".format(item['id'],item['common_name'],item['scientific_name'],item['family'],item['family_common_name'],item['genus'],item['image_url']))
+        # print("plant_api_id: {}\ncommon_name: {}\nscientific_name: {}\nfamily: {}\nfamily_common_name: {}\ngenus: {}\nimage_url: {}\n".format(item['id'],item['common_name'],item['scientific_name'],item['family'],item['family_common_name'],item['genus'],item['image_url']))
 
         dbPlant = Plant(
             plant_api_id=item['id'],
@@ -56,14 +57,6 @@ def search():
             genus=item['genus'],
             image_url=item['image_url'],
         )
-
-        # if the item does not already exists in your database, insert it
-        # don't forget to take this shit out starting here
-        # plant = db.session.query(Plant.plant_api_id).filter_by(plant_api_id=item['id']).first()
-        # if plant is None: 
-        #     db.session.add(dbPlant)
-        #     db.session.commit()
-        # take this shit out above
 
         print("*** plant", dbPlant.common_name)
 
@@ -145,3 +138,75 @@ def login():
 
     return jsonify(json_result)
 
+@app.route("/plants", methods=["POST"])
+@cross_origin()
+def add_plants():
+    """Adding plants to users_plants table."""
+
+    user_id = request.json["userId"]
+    plant_api_id = request.json["plantApiId"]
+    common_name = request.json["commonName"]
+    scientific_name = request.json["scientificName"]
+    family = request.json["family"]
+    family_common_name = request.json["familyCommonName"]
+    genus = request.json["genus"]
+    image_url = request.json["imageUrl"]
+    
+    dbPlant = Plant(
+        plant_api_id=plant_api_id,
+        common_name=common_name,
+        scientific_name=scientific_name,
+        family=family,
+        family_common_name=family_common_name,
+        genus=genus,
+        image_url=image_url,
+    )
+
+    plant = db.session.query(Plant.plant_api_id).filter_by(plant_api_id=plant_api_id).first()
+    if plant is None: 
+        db.session.add(dbPlant)
+        db.session.commit()
+    
+    plant = Plant.query.filter_by(plant_api_id=dbPlant.plant_api_id).first()
+    plant_id = plant.id 
+
+    dbUsersPlants = UserPlant(
+        user_id=user_id,
+        plant_id=plant_id,
+    )
+
+    db.session.add(dbUsersPlants)
+    db.session.commit()
+
+    print("dbUsersPlants*****", dbUsersPlants)
+    print("PLANT", plant)
+    print("PLANT", plant.id)
+    print("dbPlant.id", dbPlant.plant_api_id)
+
+    json_result = {}
+    new_plant = {}
+    new_plant["userId"] = user_id
+    new_plant["plantId"] = plant_id
+    json_result["usersPlant"] = new_plant
+
+    return jsonify(json_result)
+ 
+
+
+# dbPlant = Plant(
+#             plant_api_id=item['id'],
+#             common_name=item['common_name'],
+#             scientific_name=item['scientific_name'],
+#             family=item['family'],
+#             family_common_name=item['family_common_name'],
+#             genus=item['genus'],
+#             image_url=item['image_url'],
+#         )
+
+#         # if the item does not already exists in your database, insert it
+#         # don't forget to take this shit out starting here
+#         # plant = db.session.query(Plant.plant_api_id).filter_by(plant_api_id=item['id']).first()
+#         # if plant is None: 
+#         #     db.session.add(dbPlant)
+#         #     db.session.commit()
+#         # take this shit out above
