@@ -191,6 +191,24 @@ def add_plants():
 
     return jsonify(json_result)
 
+@app.route("/plants", methods=["DELETE"])
+@cross_origin()
+def delete_plants():
+    """Deleting plant from user's account."""
+
+    user_plant_id = request.json["userPlantId"]
+
+    user_plant = UserPlant.query.get(user_plant_id)
+    db.session.delete(user_plant)
+    db.session.commit()
+
+    json_result = {}
+    delete_message = {}
+    delete_message["message"] = "successfully removed plant"
+    json_result["result"] = delete_message
+
+    return jsonify(json_result)
+
 @app.route("/plants/user/<int:user_id>", methods=["GET"])
 @cross_origin()
 def show_user_plants(user_id):
@@ -206,12 +224,15 @@ def show_user_plants(user_id):
 
     for user_plant in users_plants:
         print("plant", user_plant)
-        print("plant", user_plant.plant_id)
+        print("plant", user_plant.id)
         
         plant = Plant.query.get(user_plant.plant_id)
         print("THEplant*************", plant)
         print("plantAPI*************", plant.plant_api_id)
-        result_plants.append(plant.to_json())
+
+        modified_plant = plant.to_json();
+        modified_plant["user_plant_id"] = user_plant.id
+        result_plants.append(modified_plant)
     
     json_result["results"] = result_plants
     return jsonify(json_result)
