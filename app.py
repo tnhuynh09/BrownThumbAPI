@@ -191,12 +191,12 @@ def add_plants():
 
     return jsonify(json_result)
 
-@app.route("/plants", methods=["DELETE"])
+@app.route("/plants/<int:user_plant_id>", methods=["DELETE"])
 @cross_origin()
-def delete_plants():
+def delete_user_plants(user_plant_id):
     """Deleting plant from user's account."""
 
-    user_plant_id = request.json["userPlantId"]
+    # user_plant_id = request.json["userPlantId"]
 
     user_plant = UserPlant.query.get(user_plant_id)
     db.session.delete(user_plant)
