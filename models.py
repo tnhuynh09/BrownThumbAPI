@@ -133,8 +133,6 @@ class Plant(db.Model):
 
     plants_owned = db.relationship('UserPlant', backref='plants')
 
-    journal_entry = db.relationship('PlantJournal', backref='plants')
-
     def to_json(self):
         return {
             "id": self.id,
@@ -223,6 +221,8 @@ class UserPlant(db.Model):
         db.String(100),
     )
 
+    journal_entry = db.relationship('PlantJournal', backref='users_plants')
+
 class PlantJournal(db.Model):
     """Reference the journals added to each plants."""
 
@@ -233,9 +233,9 @@ class PlantJournal(db.Model):
         primary_key=True,
     )
 
-    plant_id = db.Column(
+    user_plant_id = db.Column(
         db.Integer,
-        db.ForeignKey('plants.id', ondelete='CASCADE'),
+        db.ForeignKey('users_plants.id', ondelete='CASCADE'),
         nullable=False,
     )
 
@@ -244,6 +244,13 @@ class PlantJournal(db.Model):
         db.ForeignKey('progress_journals.id', ondelete='CASCADE'),
         nullable=False,
     )
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "plantId": self.username,
+            "JournalId": self.image_url,
+        }
 
 def connect_db(app):
     """Connect this database to provided Flask app.

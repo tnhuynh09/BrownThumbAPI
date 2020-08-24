@@ -236,3 +236,11 @@ def show_user_plants(user_id):
     
     json_result["results"] = result_plants
     return jsonify(json_result)
+
+@app.route("/plants/<int:user_plant_id>/journal", methods=["POST"])
+@cross_origin()
+def add_plant_journal(user_plant_id):
+    """Add journal to a user's plant."""
+    user_plant = UserPlant.query.get_or_404(user_plant_id)
+    print("user_plant", user_plant)
+    return "ADD JOURNAL!"
