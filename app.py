@@ -190,23 +190,28 @@ def add_plants():
     json_result["usersPlant"] = new_plant
 
     return jsonify(json_result)
- 
 
+@app.route("/plants/user/<int:user_id>", methods=["GET"])
+@cross_origin()
+def show_user_plants(user_id):
+    """Show all plants user added."""
 
-# dbPlant = Plant(
-#             plant_api_id=item['id'],
-#             common_name=item['common_name'],
-#             scientific_name=item['scientific_name'],
-#             family=item['family'],
-#             family_common_name=item['family_common_name'],
-#             genus=item['genus'],
-#             image_url=item['image_url'],
-#         )
+    user = User.query.get_or_404(user_id)
+    print("user", user)
+    users_plants = UserPlant.query.filter_by(user_id=user_id).all()
+    print("users_plants", users_plants)
 
-#         # if the item does not already exists in your database, insert it
-#         # don't forget to take this shit out starting here
-#         # plant = db.session.query(Plant.plant_api_id).filter_by(plant_api_id=item['id']).first()
-#         # if plant is None: 
-#         #     db.session.add(dbPlant)
-#         #     db.session.commit()
-#         # take this shit out above
+    json_result = {}
+    result_plants = []
+
+    for user_plant in users_plants:
+        print("plant", user_plant)
+        print("plant", user_plant.plant_id)
+        
+        plant = Plant.query.get(user_plant.plant_id)
+        print("THEplant*************", plant)
+        print("plantAPI*************", plant.plant_api_id)
+        result_plants.append(plant.to_json())
+    
+    json_result["results"] = result_plants
+    return jsonify(json_result)
