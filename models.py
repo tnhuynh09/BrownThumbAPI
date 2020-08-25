@@ -178,6 +178,15 @@ class ProgressJournal(db.Model):
 
     journal_entry = db.relationship('PlantJournal', backref='progress_journals')
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "date": self.date,
+            "imageUrl": self.image_url,
+            "notes": self.notes,
+        }
+
 class UserPlant(db.Model):
     """References the plants that each user added."""
 
@@ -248,8 +257,8 @@ class PlantJournal(db.Model):
     def to_json(self):
         return {
             "id": self.id,
-            "plantId": self.username,
-            "JournalId": self.image_url,
+            "userPlantId": self.user_plant_id,
+            "journalId": self.journal_id,
         }
 
 def connect_db(app):

@@ -196,8 +196,6 @@ def add_plants():
 def delete_user_plants(user_plant_id):
     """Deleting plant from user's account."""
 
-    # user_plant_id = request.json["userPlantId"]
-
     user_plant = UserPlant.query.get(user_plant_id)
     db.session.delete(user_plant)
     db.session.commit()
@@ -241,6 +239,76 @@ def show_user_plants(user_id):
 @cross_origin()
 def add_plant_journal(user_plant_id):
     """Add journal to a user's plant."""
+
+    title = request.json["title"]
+    image_url = request.json["imageUrl"]
+    notes = request.json["notes"]
+    
+    dbProgressJournal = ProgressJournal(
+        title=title,
+        image_url=image_url,
+        notes=notes,
+    )
+
+    db.session.add(dbProgressJournal)
+    db.session.commit()
+
+    progressJournal = ProgressJournal.query.filter_by(id=dbProgressJournal.id).first()
+
+    dbPlantJournal = PlantJournal(
+        user_plant_id=user_plant_id,
+        journal_id=progressJournal.id,
+    )
+
+    db.session.add(dbPlantJournal)
+    db.session.commit()
+
+    json_result = {}
+    message = {}
+    message["message"] = "journal successfully added"
+    json_result["result"] = message
+
+    return jsonify(json_result)
+
+@app.route("/plants/<int:user_plant_id>/journal", methods=["GET"])
+@cross_origin()
+def show_plant_journals(user_plant_id):
+    """Show all journals to a user's plant."""
+
     user_plant = UserPlant.query.get_or_404(user_plant_id)
-    print("user_plant", user_plant)
-    return "ADD JOURNAL!"
+    print("user", user_plant)
+    plants_journals = PlantJournal.query.filter_by(user_plant_id=user_plant_id).all()
+    print("users_plants", plants_journals)
+
+    json_result = {}
+    result_journals = []
+    
+    for plant_journal in plants_journals:
+ 
+        journal = ProgressJournal.query.get(plant_journal.journal_id)
+        journal = journal.to_json();
+        result_journals.append(journal)
+    
+    json_result["results"] = result_journals
+    return jsonify(json_result)
+
+@app.route("/plants/<int:plant_journal_id>/journal", methods=["DELETE"])
+@cross_origin()
+def delete_plant_journals(plant_journal_id):
+    """Deleting a journal from a user's plant."""
+
+    plant_journal = PlantJournal.query.get(plant_journal_id)
+    progress_journal = ProgressJournal.query.get(plant_journal.journal_id)
+
+    db.session.delete(plant_journal)
+    db.session.commit()
+
+    db.session.delete(progress_journal)
+    db.session.commit()
+
+    json_result = {}
+    delete_message = {}
+    delete_message["message"] = "successfully removed journal"
+    json_result["result"] = delete_message
+
+    return jsonify(json_result)
