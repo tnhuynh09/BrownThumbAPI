@@ -138,6 +138,25 @@ def login():
 
     return jsonify(json_result)
 
+@app.route("/users/edit", methods=["PATCH"])
+@cross_origin()
+def edit_user():
+    """Handle user profile edit."""
+
+    user_id = request.json["userId"]
+    new_image_url = request.json["imageUrl"]
+    user = User.query.get_or_404(user_id)
+
+    db.session.query(User).filter_by(id=user_id).update({User.image_url: new_image_url})
+
+    db.session.add(user)
+    db.session.commit()
+
+    json_result = {}
+    json_result["user"] = user.to_json()
+    
+    return jsonify(json_result)
+
 @app.route("/plants", methods=["POST"])
 @cross_origin()
 def add_plants():
