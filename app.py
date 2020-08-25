@@ -191,6 +191,19 @@ def add_plants():
 
     return jsonify(json_result)
 
+@app.route("/plants/<int:user_plant_id>", methods=["GET"])
+@cross_origin()
+def get_user_plant(user_plant_id):
+    """Get a single user_plant."""
+
+    user_plant = UserPlant.query.get(user_plant_id)
+    plant = Plant.query.get(user_plant.plant_id)
+
+    json_result = {}
+    json_result["result"] = plant.to_json()
+
+    return jsonify(json_result)
+
 @app.route("/plants/<int:user_plant_id>", methods=["DELETE"])
 @cross_origin()
 def delete_user_plants(user_plant_id):
@@ -228,7 +241,7 @@ def show_user_plants(user_id):
         print("THEplant*************", plant)
         print("plantAPI*************", plant.plant_api_id)
 
-        modified_plant = plant.to_json();
+        modified_plant = plant.to_json()
         modified_plant["user_plant_id"] = user_plant.id
         result_plants.append(modified_plant)
     
@@ -286,7 +299,7 @@ def show_plant_journals(user_plant_id):
     for plant_journal in plants_journals:
  
         journal = ProgressJournal.query.get(plant_journal.journal_id)
-        journal = journal.to_json();
+        journal = journal.to_json()
         result_journals.append(journal)
     
     json_result["results"] = result_journals
