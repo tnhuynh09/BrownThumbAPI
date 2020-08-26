@@ -29,6 +29,7 @@ def test():
 @cross_origin()
 def search():
     """Handle search."""
+    
     query = request.args["query"]
 
     result_plants = []
@@ -46,8 +47,7 @@ def search():
     
     # if res_trefle is NOT null -> that means wer are succesfully being able to get something back from external API
     for item in data:
-        # print("plant_api_id: {}\ncommon_name: {}\nscientific_name: {}\nfamily: {}\nfamily_common_name: {}\ngenus: {}\nimage_url: {}\n".format(item['id'],item['common_name'],item['scientific_name'],item['family'],item['family_common_name'],item['genus'],item['image_url']))
-
+        
         dbPlant = Plant(
             plant_api_id=item['id'],
             common_name=item['common_name'],
@@ -57,8 +57,6 @@ def search():
             genus=item['genus'],
             image_url=item['image_url'],
         )
-
-        print("*** plant", dbPlant.common_name)
 
         #add item to result_plants array
         result_plants.append(dbPlant.to_json())
@@ -103,12 +101,14 @@ def signup():
     
     if json_errors:
         json_result["errors"] = json_errors
+
         return (jsonify(json_result))
     
     else:
         user = User.signup(username, password, image_url)
         if user == None:
             username_errors.append("This username already exist. Please try another.")
+
             json_errors["username"] = username_errors
             json_result["errors"] = json_errors
         else:
@@ -186,6 +186,7 @@ def add_plants():
     )
 
     plant = db.session.query(Plant.plant_api_id).filter_by(plant_api_id=plant_api_id).first()
+
     if plant is None: 
         db.session.add(dbPlant)
         db.session.commit()
@@ -200,11 +201,6 @@ def add_plants():
 
     db.session.add(dbUsersPlants)
     db.session.commit()
-
-    print("dbUsersPlants*****", dbUsersPlants)
-    print("PLANT", plant)
-    print("PLANT", plant.id)
-    print("dbPlant.id", dbPlant.plant_api_id)
 
     json_result = {}
     new_plant = {}
@@ -233,6 +229,7 @@ def delete_user_plants(user_plant_id):
     """Deleting plant from user's account."""
 
     user_plant = UserPlant.query.get(user_plant_id)
+
     db.session.delete(user_plant)
     db.session.commit()
 
@@ -249,23 +246,16 @@ def show_user_plants(user_id):
     """Show all plants user added."""
 
     user = User.query.get_or_404(user_id)
-    print("user", user)
     users_plants = UserPlant.query.filter_by(user_id=user_id).all()
-    print("users_plants", users_plants)
 
     json_result = {}
     result_plants = []
 
     for user_plant in users_plants:
-        print("plant", user_plant)
-        print("plant", user_plant.id)
-        
         plant = Plant.query.get(user_plant.plant_id)
-        print("THEplant*************", plant)
-        print("plantAPI*************", plant.plant_api_id)
-
         modified_plant = plant.to_json()
         modified_plant["user_plant_id"] = user_plant.id
+
         result_plants.append(modified_plant)
     
     json_result["results"] = result_plants
@@ -274,7 +264,7 @@ def show_user_plants(user_id):
 @app.route("/plants/<int:user_plant_id>/journal", methods=["POST"])
 @cross_origin()
 def add_plant_journal(user_plant_id):
-    """Add journal to a user's plant."""
+    """Add a journal to a plant."""
 
     title = request.json["title"]
     image_url = request.json["imageUrl"]
@@ -312,20 +302,18 @@ def add_plant_journal(user_plant_id):
 @app.route("/plants/<int:user_plant_id>/journal", methods=["GET"])
 @cross_origin()
 def show_plant_journals(user_plant_id):
-    """Show all journals to a user's plant."""
+    """Show all journals of a plant."""
 
     user_plant = UserPlant.query.get_or_404(user_plant_id)
-    print("user", user_plant)
     plants_journals = PlantJournal.query.filter_by(user_plant_id=user_plant_id).all()
-    print("users_plants", plants_journals)
 
     json_result = {}
     result_journals = []
     
     for plant_journal in plants_journals:
- 
         journal = ProgressJournal.query.get(plant_journal.journal_id)
         journal = journal.to_json()
+
         result_journals.append(journal)
     
     json_result["results"] = result_journals
