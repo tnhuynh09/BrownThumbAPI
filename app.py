@@ -145,6 +145,10 @@ def edit_user():
 
     user_id = request.json["userId"]
     new_image_url = request.json["imageUrl"]
+
+    if not new_image_url:
+        new_image_url = "http://brown-thumb-api.herokuapp.com/static/images/profile-default.png"
+
     user = User.query.get_or_404(user_id)
 
     db.session.query(User).filter_by(id=user_id).update({User.image_url: new_image_url})
