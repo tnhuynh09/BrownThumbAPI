@@ -32,7 +32,7 @@ class User(db.Model):
 
     image_url = db.Column(
         db.Text,
-        default="/static/images/default-pic.png",
+        default="http://brown-thumb-api.herokuapp.com/static/images/profile-default.png",
     )
 
     plants_owned = db.relationship('UserPlant', backref='user')
@@ -128,7 +128,7 @@ class Plant(db.Model):
 
     image_url = db.Column(
         db.Text,
-        default="/static/images/default-pic.png",
+        default="http://brown-thumb-api.herokuapp.com/static/images/plant-default.png",
     )
 
     plants_owned = db.relationship('UserPlant', backref='plants')
@@ -168,7 +168,7 @@ class ProgressJournal(db.Model):
 
     image_url = db.Column(
         db.Text,
-        default="/static/images/default-pic.png",
+        default="http://brown-thumb-api.herokuapp.com/static/images/journal-default.jpeg",
     )
 
     notes = db.Column(
