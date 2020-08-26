@@ -91,7 +91,7 @@ def signup():
         password_errors.append("Password must have at least 6 characters.")
 
     if not image_url:
-        image_url = "/static/images/default-pic.png"
+        image_url = "http://brown-thumb-api.herokuapp.com/static/images/profile-default.png"
 
     json_errors = {}
 
@@ -275,6 +275,9 @@ def add_plant_journal(user_plant_id):
     title = request.json["title"]
     image_url = request.json["imageUrl"]
     notes = request.json["notes"]
+
+    if not image_url:
+        image_url = "http://brown-thumb-api.herokuapp.com/static/images/journal-default.jpeg"
     
     dbProgressJournal = ProgressJournal(
         title=title,
