@@ -21,10 +21,6 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "br0wnthumbs")
 
 connect_db(app)
 
-@app.route("/test", methods=["GET"])
-def test():
-    return ("WORKS")
-
 @app.route("/search", methods=["GET"])
 @cross_origin()
 def search():

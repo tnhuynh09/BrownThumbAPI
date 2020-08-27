@@ -19,7 +19,7 @@ class BrownThumbTestCase(TestCase):
         db.create_all()
 
         # CREATE USER 
-        user1 = User.signup("test_username", "test_password", None)
+        user1 = User.signup("test_username", "test_password", "")
         user_id = 1111
         user1.id = user_id
         
@@ -130,11 +130,11 @@ class BrownThumbTestCase(TestCase):
         """Test user signup."""
 
         user_test = User.signup("test_username777", "test_password777", None)
-        user_id = 7777
-        user_test.id = user_id
+        user_id2 = 7777
+        user_test.id = user_id2
         db.session.commit()
 
-        user_test = User.query.get(user_id)
+        user_test = User.query.get(user_id2)
 
         self.assertIsNotNone(user_test)
         self.assertEqual(user_test.username, "test_username777")
@@ -298,3 +298,42 @@ class BrownThumbTestCase(TestCase):
         print("*******************************")
         print("test --- test_plant_journal_model")
         print("*******************************")
+
+# **************************
+# BROWN THUMB VIEWS TEST 
+
+    def test_search(self):
+        with self.client as client:
+            resp = client.get("/search?query=rose")
+        
+        self.assertIn("field rose", str(resp.data))
+        self.assertIn("commonName", str(resp.data))
+        self.assertIn("imageUrl", str(resp.data))
+        self.assertEqual(resp.status_code, 200)
+
+        print("*******************************")
+        print("test --- test_search")
+        print("*******************************")
+
+    def test_get_user_plant(self):
+        with self.client as client:
+            resp = client.get(f"/plants/{self.user_plant_id}")
+        
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("water mint", str(resp.data))
+
+        print("*******************************")
+        print("test --- test_get_user_plant")
+        print("*******************************")
+    
+    def test_get_plant_journal(self):
+        with self.client as client:
+            resp = client.get(f"/plants/{self.user_plant_id}/journal")
+        
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("test title journal", str(resp.data))
+
+        print("*******************************")
+        print("test --- test_get_user_plant")
+        print("*******************************")
+    
