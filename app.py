@@ -1,6 +1,7 @@
 import os 
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
+from flask_swagger_ui import get_swaggerui_blueprint
 import re
 import requests
 # from flask_debugtoolbar import DebugToolbarExtension
@@ -20,6 +21,19 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "br0wnthumbs")
 # toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
+
+### swagger specific ###
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "brown-thumb-api"
+    }
+)
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+### end swagger specific ###
 
 @app.route("/search", methods=["GET"])
 @cross_origin()

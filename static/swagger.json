@@ -1,0 +1,662 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "description": "",
+        "version": "1.0.0",
+        "title": "brown-thumb-api",
+        "license": {
+            "name": "",
+            "url": ""
+        }
+    },
+    "servers": [
+        {
+            "url": "/"
+        }
+    ],
+    "tags": [
+        {
+            "name": "search",
+            "description": "Handle search for plants from external plant database"
+        },
+        {
+            "name": "user",
+            "description": "Operations about user"
+        },
+        {
+            "name": "plant",
+            "description": "Operations about plant"
+        },
+        {
+            "name": "journal",
+            "description": "Operations about journal"
+        }
+    ],
+    "paths": {
+        "/search": {
+            "get": {
+                "tags": [
+                    "search"
+                ],
+                "summary": "Return plants",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "required": true,
+                        "description": "Search for Plants",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "results": {
+                                            "type": "array",
+                                            "description": "List of Results",
+                                            "items": {
+                                                "properties": {
+                                                    "commonName": {
+                                                        "type": "string"
+                                                    },
+                                                    "family": {
+                                                        "type": "string"
+                                                    },
+                                                    "familyCommonName": {
+                                                        "type": "string"
+                                                    },
+                                                    "genus": {
+                                                        "type": "string"
+                                                    },
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "imageUrl": {
+                                                        "type": "string"
+                                                    },
+                                                    "plantApiId": {
+                                                        "type": "integer"
+                                                    },
+                                                    "scientificName": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/signup": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Signup new users",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "imageUrl": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "imageUrl": {
+                                                    "type": "string"
+                                                },
+                                                "username": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Login users",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "imageUrl": {
+                                                    "type": "string"
+                                                },
+                                                "username": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/edit": {
+            "patch": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Edit user's profile",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "userId": {
+                                        "type": "string"
+                                    },
+                                    "imageUrl": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "imageUrl": {
+                                                    "type": "string"
+                                                },
+                                                "username": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/plants": {
+            "post": {
+                "tags": [
+                    "plant"
+                ],
+                "summary": "Adding plant to user's profile",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "userId": {
+                                        "type": "integer"
+                                    },
+                                    "plantApiId": {
+                                        "type": "integer"
+                                    },
+                                    "commonName": {
+                                        "type": "string"
+                                    },
+                                    "scientificName": {
+                                        "type": "string"
+                                    },
+                                    "family": {
+                                        "type": "string"
+                                    },
+                                    "familyCommonName": {
+                                        "type": "string"
+                                    },
+                                    "genus": {
+                                        "type": "string"
+                                    },
+                                    "imageUrl": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "usersPlant": {
+                                            "type": "object",
+                                            "properties": {
+                                                "plantId": {
+                                                    "type": "integer"
+                                                },
+                                                "userId": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/plants/{user_plant_id}": {
+            "get": {
+                "tags": [
+                    "plant"
+                ],
+                "summary": "Get information on a single plant from owned plants",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "user_plant_id",
+                        "required": true,
+                        "description": "The User Plant Id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "object",
+                                            "properties": {
+                                                "commonName": {
+                                                    "type": "string"
+                                                },
+                                                "family": {
+                                                    "type": "string"
+                                                },
+                                                "familyCommonName": {
+                                                    "type": "string"
+                                                },
+                                                "genus": {
+                                                    "type": "string"
+                                                },
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "imageUrl": {
+                                                    "type": "string"
+                                                },
+                                                "plantApiId": {
+                                                    "type": "integer"
+                                                },
+                                                "scientificName": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "plant"
+                ],
+                "summary": "Deleting a plant from user's account",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "user_plant_id",
+                        "required": true,
+                        "description": "The User Plant Id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/plants/user/{user_id}": {
+            "get": {
+                "tags": [
+                    "plant"
+                ],
+                "summary": "Show all plants user added",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "user_id",
+                        "required": true,
+                        "description": "The User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "results": {
+                                            "type": "array",
+                                            "description": "List of Results",
+                                            "items": {
+                                                "properties": {
+                                                    "commonName": {
+                                                        "type": "string"
+                                                    },
+                                                    "family": {
+                                                        "type": "string"
+                                                    },
+                                                    "familyCommonName": {
+                                                        "type": "string"
+                                                    },
+                                                    "genus": {
+                                                        "type": "string"
+                                                    },
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "imageUrl": {
+                                                        "type": "string"
+                                                    },
+                                                    "plantApiId": {
+                                                        "type": "integer"
+                                                    },
+                                                    "scientificName": {
+                                                        "type": "string"
+                                                    },
+                                                    "user_plant_id": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/plants/{user_plant_id}/journal": {
+            "post": {
+                "tags": [
+                    "journal"
+                ],
+                "summary": "Add a journal to a plant",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "user_plant_id",
+                        "required": true,
+                        "description": "The User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "imageUrl": {
+                                        "type": "string"
+                                    },
+                                    "notes": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "journal"
+                ],
+                "summary": "Show all journals of a plant",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "user_plant_id",
+                        "required": true,
+                        "description": "The User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "results": {
+                                            "type": "array",
+                                            "description": "List of Results",
+                                            "items": {
+                                                "properties": {
+                                                    "date": {
+                                                        "type": "string"
+                                                    },
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "imageUrl": {
+                                                        "type": "string"
+                                                    },
+                                                    "notes": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/plants/{plant_journal_id}/journal": {
+            "delete": {
+                "tags": [
+                    "journal"
+                ],
+                "summary": "Deleting a journal from a user's plant",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "plant_journal_id",
+                        "required": true,
+                        "description": "The User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
