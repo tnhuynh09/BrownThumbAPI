@@ -4,6 +4,7 @@ from flask_cors import CORS, cross_origin
 from flask_swagger_ui import get_swaggerui_blueprint
 import re
 import requests
+import jwt
 # from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, User, Plant, ProgressJournal, UserPlant, PlantJournal
@@ -19,6 +20,10 @@ app.config['SQLALCHEMY_ECHO'] = False
 # app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "br0wnthumbs")
 # toolbar = DebugToolbarExtension(app)
+
+JWT_SECRET = app.config['SECRET_KEY']
+JWT_ALGORITHM = 'HS256'
+JWT_EXP_DELTA_SECONDS = 86400
 
 connect_db(app)
 
@@ -123,6 +128,8 @@ def signup():
             json_result["errors"] = json_errors
         else:
             json_result["user"] = user.to_json()
+            jwt_token = jwt.encode(user.to_json(), JWT_SECRET, JWT_ALGORITHM)
+            json_result["jwt"] = jwt_token.decode('utf-8')
 
         return jsonify(json_result)
 
@@ -130,7 +137,6 @@ def signup():
 @cross_origin()
 def login():
     """Handle user login."""
-
     username = request.json["username"]
     password = request.json["password"]
 
@@ -145,6 +151,8 @@ def login():
 
     else:
         json_result["user"] = user.to_json()
+        jwt_token = jwt.encode(user.to_json(), JWT_SECRET, JWT_ALGORITHM)
+        json_result["jwt"] = jwt_token.decode('utf-8')
 
     return jsonify(json_result)
 
@@ -155,6 +163,14 @@ def edit_user():
 
     user_id = request.json["userId"]
     new_image_url = request.json["imageUrl"]
+
+    # decode JWT here
+    # Check to see if user_id is equal to the decode_jwt_user_id
+    # if they don't match, return an error or something
+
+    jwt_user = decode_jwt(request)
+    if user_id is not jwt_user["id"]:
+        return jsonify({"error": "Unauthorized"})
 
     if not new_image_url:
         new_image_url = "http://brown-thumb-api.herokuapp.com/static/images/profile-default.png"
@@ -184,6 +200,14 @@ def add_plants():
     family_common_name = request.json["familyCommonName"]
     genus = request.json["genus"]
     image_url = request.json["imageUrl"]
+
+    # decode JWT here
+    # Check to see if user_id is equal to the decode_jwt_user_id
+    # if they don't match, return an error or something
+
+    jwt_user = decode_jwt(request)
+    if user_id is not jwt_user["id"]:
+        return jsonify({"error": "Unauthorized"})
     
     dbPlant = Plant(
         plant_api_id=plant_api_id,
@@ -226,6 +250,15 @@ def get_user_plant(user_plant_id):
     """Get a single user_plant."""
 
     user_plant = UserPlant.query.get(user_plant_id)
+
+    # decode JWT
+    # check if user_plant.user_id is the same as jwt user id
+    # if not return error
+
+    jwt_user = decode_jwt(request)
+    if user_plant.user_id is not jwt_user["id"]:
+        return jsonify({"error": "Unauthorized"})
+
     plant = Plant.query.get(user_plant.plant_id)
 
     json_result = {}
@@ -239,6 +272,13 @@ def delete_user_plants(user_plant_id):
     """Deleting plant from user's account."""
 
     user_plant = UserPlant.query.get(user_plant_id)
+    # decode JWT
+    # check if user_plant.user_id is the same as jwt user id
+    # if not return error
+
+    jwt_user = decode_jwt(request)
+    if user_plant.user_id is not jwt_user["id"]:
+        return jsonify({"error": "Unauthorized"})
 
     db.session.delete(user_plant)
     db.session.commit()
@@ -254,6 +294,14 @@ def delete_user_plants(user_plant_id):
 @cross_origin()
 def show_user_plants(user_id):
     """Show all plants user added."""
+
+    # decode JWT
+    # check if user_id is the same as jwt user id
+    # if not return error
+
+    jwt_user = decode_jwt(request)
+    if user_id is not jwt_user["id"]:
+        return jsonify({"error": "Unauthorized"})
 
     user = User.query.get_or_404(user_id)
     users_plants = UserPlant.query.filter_by(user_id=user_id).all()
@@ -275,6 +323,15 @@ def show_user_plants(user_id):
 @cross_origin()
 def add_plant_journal(user_plant_id):
     """Add a journal to a plant."""
+    user_plant = UserPlant.query.get(user_plant_id)
+    # decode JWT
+    # check if user_plant.user_id is the same as jwt user id
+    # if not return error
+
+    jwt_user = decode_jwt(request)
+    if user_plant.user_id is not jwt_user["id"]:
+        return jsonify({"error": "Unauthorized"})
+
 
     title = request.json["title"]
     image_url = request.json["imageUrl"]
@@ -315,6 +372,14 @@ def show_plant_journals(user_plant_id):
     """Show all journals of a plant."""
 
     user_plant = UserPlant.query.get_or_404(user_plant_id)
+    # decode JWT
+    # check if user_plant.user_id is the same as jwt user id
+    # if not return error
+
+    jwt_user = decode_jwt(request)
+    if user_plant.user_id is not jwt_user["id"]:
+        return jsonify({"error": "Unauthorized"})
+
     plants_journals = PlantJournal.query.filter_by(user_plant_id=user_plant_id).all()
 
     json_result = {}
@@ -335,6 +400,16 @@ def delete_plant_journals(plant_journal_id):
     """Deleting a journal from a user's plant."""
 
     plant_journal = PlantJournal.query.get(plant_journal_id)
+
+    # decode JWT
+    # get user_plant from plant_journal.user_plant_id
+    # check if user_plant.user_id is the same as jwt user id
+    # if not return error
+    user_plant = UserPlant.query.get_or_404(plant_journal.user_plant_id)
+    jwt_user = decode_jwt(request)
+    if user_plant.user_id is not jwt_user["id"]:
+        return jsonify({"error": "Unauthorized"})
+
     progress_journal = ProgressJournal.query.get(plant_journal.journal_id)
 
     db.session.delete(plant_journal)
@@ -349,3 +424,8 @@ def delete_plant_journals(plant_journal_id):
     json_result["result"] = delete_message
 
     return jsonify(json_result)
+
+def decode_jwt(request):
+    jwt_token = request.headers["Authorization"]
+    user = jwt.decode(jwt_token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    return user
