@@ -169,7 +169,7 @@ def edit_user():
     # if they don't match, return an error or something
 
     jwt_user = decode_jwt(request)
-    if user_id is not jwt_user["id"]:
+    if int(user_id) is not jwt_user["id"]:
         return jsonify({"error": "Unauthorized"})
 
     if not new_image_url:
@@ -206,7 +206,7 @@ def add_plants():
     # if they don't match, return an error or something
 
     jwt_user = decode_jwt(request)
-    if user_id is not jwt_user["id"]:
+    if int(user_id) is not jwt_user["id"]:
         return jsonify({"error": "Unauthorized"})
     
     dbPlant = Plant(
@@ -256,7 +256,7 @@ def get_user_plant(user_plant_id):
     # if not return error
 
     jwt_user = decode_jwt(request)
-    if user_plant.user_id is not jwt_user["id"]:
+    if int(user_plant.user_id) is not jwt_user["id"]:
         return jsonify({"error": "Unauthorized"})
 
     plant = Plant.query.get(user_plant.plant_id)
@@ -277,7 +277,7 @@ def delete_user_plants(user_plant_id):
     # if not return error
 
     jwt_user = decode_jwt(request)
-    if user_plant.user_id is not jwt_user["id"]:
+    if int(user_plant.user_id) is not jwt_user["id"]:
         return jsonify({"error": "Unauthorized"})
 
     db.session.delete(user_plant)
@@ -298,9 +298,10 @@ def show_user_plants(user_id):
     # decode JWT
     # check if user_id is the same as jwt user id
     # if not return error
+    # print("show_user_plants user_id", request.headers["Authorization"])
 
     jwt_user = decode_jwt(request)
-    if user_id is not jwt_user["id"]:
+    if int(user_id) is not jwt_user["id"]:
         return jsonify({"error": "Unauthorized"})
 
     user = User.query.get_or_404(user_id)
@@ -329,7 +330,7 @@ def add_plant_journal(user_plant_id):
     # if not return error
 
     jwt_user = decode_jwt(request)
-    if user_plant.user_id is not jwt_user["id"]:
+    if int(user_plant.user_id) is not jwt_user["id"]:
         return jsonify({"error": "Unauthorized"})
 
 
@@ -376,9 +377,9 @@ def show_plant_journals(user_plant_id):
     # check if user_plant.user_id is the same as jwt user id
     # if not return error
 
-    jwt_user = decode_jwt(request)
-    if user_plant.user_id is not jwt_user["id"]:
-        return jsonify({"error": "Unauthorized"})
+    # jwt_user = decode_jwt(request)
+    # if user_plant.user_id is not jwt_user["id"]:
+    #     return jsonify({"error": "Unauthorized"})
 
     plants_journals = PlantJournal.query.filter_by(user_plant_id=user_plant_id).all()
 
@@ -407,7 +408,7 @@ def delete_plant_journals(plant_journal_id):
     # if not return error
     user_plant = UserPlant.query.get_or_404(plant_journal.user_plant_id)
     jwt_user = decode_jwt(request)
-    if user_plant.user_id is not jwt_user["id"]:
+    if int(user_plant.user_id) is not jwt_user["id"]:
         return jsonify({"error": "Unauthorized"})
 
     progress_journal = ProgressJournal.query.get(plant_journal.journal_id)
