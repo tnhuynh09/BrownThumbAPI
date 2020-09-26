@@ -658,5 +658,17 @@
                 }
             }
         }
-    }
+    },
+    "components": {
+        "securitySchemes": {
+            "Authorization": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "Authorization"
+            }
+        }
+    },
+    "security": [
+        "Authorization": []
+    ]
 }

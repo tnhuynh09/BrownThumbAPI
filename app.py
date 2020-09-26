@@ -248,6 +248,7 @@ def add_plants():
 @cross_origin()
 def get_user_plant(user_plant_id):
     """Get a single user_plant."""
+    print("TIGER ========== get_user_plant")
 
     user_plant = UserPlant.query.get(user_plant_id)
 
@@ -256,6 +257,7 @@ def get_user_plant(user_plant_id):
     # if not return error
 
     jwt_user = decode_jwt(request)
+    print("TIGER ========== get_user_plant jwt_user", jwt_user)
     if int(user_plant.user_id) is not jwt_user["id"]:
         return jsonify({"error": "Unauthorized"})
 
